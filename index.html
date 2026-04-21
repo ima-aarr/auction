@@ -178,21 +178,26 @@ function startGame() {
 
 function spawnWave() {
   showWave('WAVE ' + wave);
-  let cols = Math.min(3 + wave, 7);
-  let rows = Math.min(1 + Math.floor(wave / 2), 4);
-  let gx = (W - cols * 52) / 2;
+  let cols = Math.min(2 + wave, 6);
+  let rows = Math.min(1 + Math.floor((wave - 1) / 2), 4);
+  let spacing = 56;
+  let totalW = cols * spacing;
+  let gx = (W - totalW) / 2 + spacing / 2;
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
+      // type: normal for wave 1-2, elite from wave 3, boss only from wave 6+
+      let type = 'normal';
+      if (wave >= 6 && r === 0) type = 'boss';
+      else if (wave >= 3 && r === 0) type = 'elite';
+      let hp = type === 'boss' ? 4 : type === 'elite' ? 2 : 1;
       enemies.push({
-        x: gx + c * 52 + 26, y: 60 + r * 52,
+        x: gx + c * spacing, y: 70 + r * 56,
         w: 32, h: 28,
-        hp: wave > 3 ? 2 : 1,
-        maxHp: wave > 3 ? 2 : 1,
-        vx: (wave * 0.3 + 1) * (Math.random() > 0.5 ? 1 : -1),
-        vy: 0.3 + wave * 0.1,
-        shootTimer: 60 + Math.random() * 120,
-        type: wave > 5 ? 'boss' : (r === 0 ? 'elite' : 'normal'),
-        hit: 0
+        hp, maxHp: hp,
+        vx: (wave * 0.25 + 0.8) * (c % 2 === 0 ? 1 : -1),
+        vy: 0.2 + wave * 0.08,
+        shootTimer: 80 + Math.random() * 100 + (rows - r) * 20,
+        type, hit: 0
       });
     }
   }
